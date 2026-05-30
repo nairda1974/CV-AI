@@ -2,6 +2,7 @@ import { AIProvider } from "./providers/provider.interface";
 import { GeminiProvider } from "./providers/gemini.provider";
 import { OpenAIProvider } from "./providers/openai.provider";
 import { DeepSeekProvider } from "./providers/deepseek.provider";
+import { GroqProvider } from "./providers/groq.provider";
 
 export function getAIProvider(): AIProvider {
   const provider = process.env.AI_PROVIDER || "gemini";
@@ -11,6 +12,8 @@ export function getAIProvider(): AIProvider {
       return new OpenAIProvider();
     case "deepseek":
       return new DeepSeekProvider();
+    case "groq":
+      return new GroqProvider();
     case "gemini":
     default:
       return new GeminiProvider();
@@ -18,3 +21,4 @@ export function getAIProvider(): AIProvider {
 }
 
 export { runWithRetry } from "./retry";
+

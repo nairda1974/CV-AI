@@ -79,7 +79,7 @@ export default async function DashboardPage() {
       </aside>
 
       {/* Mobile Bottom Tab Bar (iOS Safe) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around items-center px-4 pb-[env(safe-area-inset-bottom,0px)] z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] flex justify-around items-center px-4 pb-[env(safe-area-inset-bottom,0px)] z-50">
         <Link href="/" className="flex flex-col items-center gap-1 text-indigo-600 dark:text-indigo-400">
           <History className="h-5 w-5" />
           <span className="text-[10px] font-semibold">Dashboard</span>
@@ -95,8 +95,9 @@ export default async function DashboardPage() {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-5 md:p-8 space-y-6 overflow-y-auto pb-24 md:pb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <main className="flex-1 p-5 md:p-8 overflow-y-auto pb-24 md:pb-8">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
               Dashboard
@@ -297,7 +298,7 @@ export default async function DashboardPage() {
                   {cvs.map((cv: any) => (
                     <div
                       key={cv.id}
-                      className="bg-white dark:bg-slate-950 p-4 border rounded-xl shadow-xs space-y-3 relative"
+                      className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-lg p-4 border border-white/50 dark:border-slate-800/50 rounded-2xl shadow-xl space-y-3 relative transition-transform active:scale-[0.98]"
                     >
                       <div className="flex justify-between items-start">
                         <div>
@@ -343,6 +344,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
             )}
+          </div>
           </div>
         </div>
       </main>

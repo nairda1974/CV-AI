@@ -1,5 +1,5 @@
 import { createGroq } from "@ai-sdk/groq";
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { AIProvider } from "./provider.interface";
 import { ZodCVProfile, CVProfile } from "@/schemas/cv-profile.schema";
 
@@ -9,48 +9,95 @@ export class GroqProvider implements AIProvider {
     apiKey: process.env.GROQ_API_KEY || "",
   });
 
-  async extractProfile(text: string) {
-    const response = await generateObject({
-      model: this.groq(this.modelName),
-      // @ts-expect-error force standard json object instead of unsupported json_schema
-      mode: "json",
-      schema: ZodCVProfile,
-      prompt: `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada respetando el esquema de datos requerido. Asegúrate de categorizar adecuadamente cada habilidad.
-
-Texto del CV:
-${text}`,
+  /**
+   * Extrae JSON validado de forma manual para evitar el fallo de "json_schema" de generateObject
+   */
+  private async generateValidatedJSON(prompt: string, schema: any, retries = 2) {
+    // Inject zod schema requirements into prompt
+    import("zod-to-json-schema").then((zodToJsonSchema) => {
+        // En producción podrías pasarle el json schema convertido. Por simplicidad pediremos JSON.
     });
 
+    const systemPrompt = `Eres un sistema backend automatizado. Tu única salida DEBE ser un objeto JSON puro, válido y minificado. NUNCA escribas texto antes o después del JSON. NO uses formato markdown (ni las marcas de bloque de código de json). SOLO devuelve las llaves del objeto JSON.`;
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await generateText({
+          model: this.groq(this.modelName),
+          system: systemPrompt,
+          prompt: prompt,
+          temperature: 0.1, // Temperatura baja para que sea determinista
+        });
+
+        // Extraer y limpiar posible markdown si el LLM lo incluye a pesar de las instrucciones
+        let text = response.text.trim();
+        if (text.startsWith("```json")) text = text.replace(/^```json/, "");
+        if (text.startsWith("```")) text = text.replace(/^```/, "");
+        if (text.endsWith("```")) text = text.replace(/```$/, "");
+        text = text.trim();
+
+        // 1. Parseo nativo
+        const parsedJSON = JSON.parse(text);
+        
+        // 2. Validación estricta con Zod
+        const validatedData = schema.parse(parsedJSON); 
+        
+        return { object: validatedData as CVProfile, usage: response.usage, text };
+      } catch (error: any) {
+        console.error(`Intento ${attempt} fallido:`, error.message);
+        if (attempt === retries) {
+          throw new Error(`Fallo tras ${retries} intentos. Error final: ${error.message}`);
+        }
+      }
+    }
+    throw new Error("Fallo inesperado durante la generación.");
+  }
+
+  async extractProfile(text: string) {
+    const prompt = `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada. Asegúrate de categorizar adecuadamente cada habilidad.
+    
+Devuelve un JSON exacto que cumpla con este formato:
+{
+  "titulo": "string",
+  "descripcion": "string",
+  "experiencia": [{"empresa": "string", "puesto": "string", "fechaInicio": "YYYY-MM", "fechaFin": "YYYY-MM o nulo", "descripcion": "string", "logros": ["string"]}],
+  "educacion": [{"institucion": "string", "titulo": "string", "fechaInicio": "YYYY-MM", "fechaFin": "YYYY-MM", "descripcion": "string"}],
+  "habilidades": [{"categoria": "string", "nombre": "string", "nivel": "Básico|Intermedio|Avanzado|Experto"}]
+}
+
+Texto del CV:
+${text}`;
+
+    const result = await this.generateValidatedJSON(prompt, ZodCVProfile);
+
     return {
-      object: response.object,
-      usage: response.usage,
+      object: result.object,
+      usage: result.usage,
       modelUsed: this.modelName,
     };
   }
 
   async adaptCV(profile: CVProfile, jobDescription: string) {
-    const response = await generateObject({
-      model: this.groq(this.modelName),
-      // @ts-expect-error force standard json object instead of unsupported json_schema
-      mode: "json",
-      schema: ZodCVProfile,
-      prompt: `Adapta el siguiente currículum vitae (CV) maestro para que se ajuste a la oferta de trabajo indicada.
+    const prompt = `Adapta el siguiente currículum vitae (CV) maestro para que se ajuste a la oferta de trabajo indicada.
 Sigue estas directrices:
 1. Reorganiza y reescribe los logros y descripciones de experiencia para destacar lo más relevante para el puesto.
 2. Identifica habilidades técnicas y blandas que coincidan con los requerimientos de la oferta.
 3. No inventes experiencia laboral ni educación ficticia. Mantente honesto respecto al CV maestro.
 4. Redacta el perfil de forma atractiva para pasar filtros ATS.
 
+Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado en el CV maestro, pero con los datos adaptados y optimizados.
+
 CV Maestro:
 ${JSON.stringify(profile, null, 2)}
 
 Oferta de Trabajo:
-${jobDescription}`,
-    });
+${jobDescription}`;
+
+    const result = await this.generateValidatedJSON(prompt, ZodCVProfile);
 
     return {
-      object: response.object,
-      usage: response.usage,
+      object: result.object,
+      usage: result.usage,
       modelUsed: this.modelName,
     };
   }

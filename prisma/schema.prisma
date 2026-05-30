@@ -4,40 +4,62 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-model PerfilMaestro {
-  id              String       @id @default(cuid())
+model MasterProfile {
+  id              String      @id @default(cuid())
   titulo          String
-  contenidoTexto  String
-  archivoUrl      String?
-  activo          Boolean      @default(false)
-  creadoEn        DateTime     @default(now())
-  actualizadoEn   DateTime     @updatedAt
-  cvsAdaptados    CVAdaptado[]
+  datosPersonales Json
+  experiencia     Json
+  educacion       Json
+  habilidades     Json
+  fotoBase64      String?
+  creadoEn        DateTime    @default(now())
+  actualizadoEn   DateTime    @updatedAt
+  cvsAdaptados    AdaptedCV[]
+
+  @@index([creadoEn])
 }
 
-model OfertaEmpleo {
-  id              String       @id @default(cuid())
-  empresa         String
-  puesto          String
-  descripcionRaw  String
-  palabrasClave   String[]
-  creadoEn        DateTime     @default(now())
-  cvsAdaptados    CVAdaptado[]
+model JobOffer {
+  id             String      @id @default(cuid())
+  empresa        String
+  puesto         String
+  descripcionRaw String
+  creadoEn       DateTime    @default(now())
+  cvsAdaptados    AdaptedCV[]
+
+  @@index([empresa, puesto])
 }
 
-model CVAdaptado {
-  id                String        @id @default(cuid())
-  perfilMaestroId   String
-  ofertaEmpleoId    String
-  contenidoJson     Json
-  pdfUrl            String?
-  plantillaId       String        @default("cv-moderno")
-  estadoGeneracion  String        @default("pending")
-  scoreFit          Float?
-  creadoEn          DateTime      @default(now())
-  perfilMaestro     PerfilMaestro @relation(fields: [perfilMaestroId], references: [id])
-  ofertaEmpleo      OfertaEmpleo  @relation(fields: [ofertaEmpleoId], references: [id])
+model AdaptedCV {
+  id              String        @id @default(cuid())
+  masterProfileId String
+  jobOfferId      String
+  contenidoJson   Json
+  scoreATS        Float         @default(0.0)
+  version         Int           @default(1)
+  creadoEn        DateTime      @default(now())
+  actualizadoEn   DateTime      @updatedAt
+  masterProfile   MasterProfile @relation(fields: [masterProfileId], references: [id], onDelete: Cascade)
+  jobOffer         JobOffer      @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
+
+  @@unique([jobOfferId, version])
+  @@index([masterProfileId])
+  @@index([jobOfferId])
+}
+
+model AIExecution {
+  id               String   @id @default(cuid())
+  proveedor        String
+  modelo           String
+  duracionMs       Int
+  promptTokens     Int
+  completionTokens Int
+  estado           String
+  error            String?
+  creadoEn         DateTime @default(now())
+
+  @@index([proveedor, modelo])
+  @@index([creadoEn])
 }

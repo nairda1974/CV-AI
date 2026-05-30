@@ -4,7 +4,7 @@ import { AIProvider } from "./provider.interface";
 import { ZodCVProfile, CVProfile } from "@/schemas/cv-profile.schema";
 
 export class GroqProvider implements AIProvider {
-  private modelName = "llama-4-scout-17b-16e-instruct"; // Hardcoded to bypass Vercel env var conflicts
+  private modelName = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   private groq = createGroq({
     apiKey: process.env.GROQ_API_KEY || "",
   });

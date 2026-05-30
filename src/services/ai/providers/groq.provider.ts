@@ -54,16 +54,49 @@ export class GroqProvider implements AIProvider {
   }
 
   async extractProfile(text: string) {
-    const prompt = `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada. Asegúrate de categorizar adecuadamente cada habilidad.
+    const prompt = `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada.
     
-Devuelve un JSON exacto que cumpla con este formato:
+Devuelve un JSON exacto que cumpla estrictamente con este formato:
 {
-  "titulo": "string",
-  "descripcion": "string",
-  "experiencia": [{"empresa": "string", "puesto": "string", "fechaInicio": "YYYY-MM", "fechaFin": "YYYY-MM o nulo", "descripcion": "string", "logros": ["string"]}],
-  "educacion": [{"institucion": "string", "titulo": "string", "fechaInicio": "YYYY-MM", "fechaFin": "YYYY-MM", "descripcion": "string"}],
-  "habilidades": [{"categoria": "string", "nombre": "string", "nivel": "Básico|Intermedio|Avanzado|Experto"}]
+  "datosPersonales": {
+    "nombre": "string (obligatorio)",
+    "email": "string (correo válido o 'No especificado@ejemplo.com')",
+    "telefono": "string (obligatorio)",
+    "ubicacion": "string (obligatorio)",
+    "linkedin": "string o cadena vacía",
+    "github": "string o cadena vacía",
+    "portfolio": "string o cadena vacía"
+  },
+  "experiencia": [
+    {
+      "empresa": "string",
+      "puesto": "string",
+      "fechaInicio": "YYYY-MM",
+      "fechaFin": "YYYY-MM o 'Presente'",
+      "descripcion": "string (al menos 10 caracteres explicativos)",
+      "logros": ["string"]
+    }
+  ],
+  "educacion": [
+    {
+      "institucion": "string",
+      "titulo": "string",
+      "fechaInicio": "YYYY-MM",
+      "fechaFin": "YYYY-MM"
+    }
+  ],
+  "habilidades": [
+    {
+      "nombre": "string",
+      "categoria": "frontend" | "backend" | "database" | "cloud" | "devops" | "soft-skill" | "other"
+    }
+  ]
 }
+
+IMPORTANTE: 
+1. La "categoria" de habilidades DEBE ser exactamente una de estas: "frontend", "backend", "database", "cloud", "devops", "soft-skill", "other". NUNCA uses otra palabra.
+2. Si falta algún dato personal obligatorio, pon "No especificado".
+3. Los 'logros' deben ser un array con al menos 1 elemento.
 
 Texto del CV:
 ${text}`;
@@ -83,9 +116,12 @@ Sigue estas directrices:
 1. Reorganiza y reescribe los logros y descripciones de experiencia para destacar lo más relevante para el puesto.
 2. Identifica habilidades técnicas y blandas que coincidan con los requerimientos de la oferta.
 3. No inventes experiencia laboral ni educación ficticia. Mantente honesto respecto al CV maestro.
-4. Redacta el perfil de forma atractiva para pasar filtros ATS.
+4. Redacta de forma atractiva para pasar filtros ATS.
 
-Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado en el CV maestro, pero con los datos adaptados y optimizados.
+Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado en el CV maestro.
+IMPORTANTE: 
+- El objeto "datosPersonales" debe mantenerse íntegro.
+- La "categoria" de cualquier habilidad DEBE ser una de estas palabras literales: "frontend", "backend", "database", "cloud", "devops", "soft-skill", "other". ¡Ninguna más!
 
 CV Maestro:
 ${JSON.stringify(profile, null, 2)}

@@ -243,7 +243,7 @@ export default async function DashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
-                      {cvs.map((cv) => (
+                      {cvs.map((cv: any) => (
                         <tr key={cv.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
                           <td className="p-4 font-medium text-slate-500">
                             {cv.creadoEn.toLocaleDateString("es-ES", {
@@ -294,7 +294,7 @@ export default async function DashboardPage() {
 
                 {/* Mobile view cards (cleaner on iOS) */}
                 <div className="block md:hidden space-y-3">
-                  {cvs.map((cv) => (
+                  {cvs.map((cv: any) => (
                     <div
                       key={cv.id}
                       className="bg-white dark:bg-slate-950 p-4 border rounded-xl shadow-xs space-y-3 relative"

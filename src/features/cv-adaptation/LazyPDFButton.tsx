@@ -6,7 +6,7 @@ import { CVProfile } from "@/schemas/cv-profile.schema";
 
 interface Props {
   cvData: CVProfile;
-  template?: "modern" | "classic" | "creative";
+  template?: "modern" | "classic" | "creative" | "adrian" | "harvard" | "executive" | "startup" | "minimalist" | "hybrid" | "bold";
   themeColor?: string;
 }
 
@@ -26,6 +26,27 @@ export default function LazyPDFButton({ cvData, template = "modern", themeColor 
       } else if (template === "creative") {
         const { CreativeCVTemplate } = await import("./CreativeCVTemplate");
         TemplateComponent = CreativeCVTemplate;
+      } else if (template === "adrian") {
+        const { AdrianCVTemplate } = await import("./AdrianCVTemplate");
+        TemplateComponent = AdrianCVTemplate;
+      } else if (template === "harvard") {
+        const { HarvardCVTemplate } = await import("./HarvardCVTemplate");
+        TemplateComponent = HarvardCVTemplate;
+      } else if (template === "executive") {
+        const { ExecutiveCVTemplate } = await import("./ExecutiveCVTemplate");
+        TemplateComponent = ExecutiveCVTemplate;
+      } else if (template === "startup") {
+        const { TechStartupCVTemplate } = await import("./TechStartupCVTemplate");
+        TemplateComponent = TechStartupCVTemplate;
+      } else if (template === "minimalist") {
+        const { MinimalistCVTemplate } = await import("./MinimalistCVTemplate");
+        TemplateComponent = MinimalistCVTemplate;
+      } else if (template === "hybrid") {
+        const { HybridATSCVTemplate } = await import("./HybridATSCVTemplate");
+        TemplateComponent = HybridATSCVTemplate;
+      } else if (template === "bold") {
+        const { BoldTypographyCVTemplate } = await import("./BoldTypographyCVTemplate");
+        TemplateComponent = BoldTypographyCVTemplate;
       } else {
         const { ModernCVTemplate } = await import("./ModernCVTemplate");
         TemplateComponent = ModernCVTemplate;

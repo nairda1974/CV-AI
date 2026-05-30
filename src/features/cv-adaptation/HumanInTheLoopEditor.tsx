@@ -26,7 +26,7 @@ export default function HumanInTheLoopEditor({ initialData, onSave, jobDescripti
   const [data, setData] = useState<CVProfile>(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [template, setTemplate] = useState<"modern" | "classic" | "creative">("modern");
+  const [template, setTemplate] = useState<"modern" | "classic" | "creative" | "adrian" | "harvard" | "executive" | "startup" | "minimalist" | "hybrid" | "bold">("modern");
   const [themeColor, setThemeColor] = useState<string>("#4F46E5");
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,19 +319,24 @@ export default function HumanInTheLoopEditor({ initialData, onSave, jobDescripti
             <CardContent className="space-y-8 pt-6">
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Plantilla del Currículum</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Button variant={template === "modern" ? "default" : "outline"} onClick={() => setTemplate("modern")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "modern" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
-                    <span className="font-bold text-base">Moderna</span>
-                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Dos columnas limpias. Un diseño estándar infalible.</span>
-                  </Button>
-                  <Button variant={template === "classic" ? "default" : "outline"} onClick={() => setTemplate("classic")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "classic" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
-                    <span className="font-bold text-base">Clásica</span>
-                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Una columna tradicional. Elegancia para banca y consultoría.</span>
-                  </Button>
-                  <Button variant={template === "creative" ? "default" : "outline"} onClick={() => setTemplate("creative")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "creative" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
-                    <span className="font-bold text-base">Creativa</span>
-                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Bloques vibrantes y foto destacada. Para marketing o tech.</span>
-                  </Button>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {[
+                    { id: "modern", name: "Moderna", desc: "Equilibrada a 2 columnas" },
+                    { id: "classic", name: "Clásica", desc: "Estilo banca/leyes (1 col)" },
+                    { id: "creative", name: "Creativa", desc: "Banner superior macizo" },
+                    { id: "adrian", name: "Adrián (Clon)", desc: "Tu diseño exacto calcado" },
+                    { id: "harvard", name: "Harvard FAANG", desc: "El estándar ATS infalible" },
+                    { id: "executive", name: "Ejecutiva", desc: "Separación horizontal gruesa" },
+                    { id: "startup", name: "Tech Startup", desc: "Modo oscuro en barra lateral" },
+                    { id: "minimalist", name: "Minimalista", desc: "Espacios blancos enormes" },
+                    { id: "hybrid", name: "Híbrida", desc: "Muro de habilidades superior" },
+                    { id: "bold", name: "Bold Typo", desc: "Letras gigantes, sin líneas" },
+                  ].map(t => (
+                    <Button key={t.id} variant={template === t.id ? "default" : "outline"} onClick={() => setTemplate(t.id as any)} className={`justify-start h-auto py-3 px-3 flex flex-col items-start gap-1 transition-all ${template === t.id ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
+                      <span className="font-bold text-[13px]">{t.name}</span>
+                      <span className="text-[10px] font-normal opacity-80 whitespace-normal text-left leading-tight">{t.desc}</span>
+                    </Button>
+                  ))}
                 </div>
               </div>
 

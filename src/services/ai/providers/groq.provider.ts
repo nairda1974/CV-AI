@@ -149,6 +149,7 @@ Reglas estrictas:
 2. Si el candidato tiene habilidades que encajan con la oferta, destácalas o sube su prioridad.
 3. EXPRESA TODAS LAS FECHAS EN FORMATO HUMANO (ej. "Septiembre de 2025" o "Actualidad"). No uses números como "2025-09".
 4. NO INVENTES experiencia laboral, años de experiencia, ni educación que no exista en el CV original. Solo optimiza la semántica y el vocabulario.
+5. MÁXIMA PRIORIDAD (SÍNTESIS 1 PÁGINA): Reduce agresivamente el contenido para que el CV final ocupe obligatoriamente 1 sola página. Resume brutalmente. Deja MÁXIMO 3 viñetas (logros) por experiencia laboral. Filtra información no relevante. Sé extremadamente conciso y denso.
 
 Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado.
 

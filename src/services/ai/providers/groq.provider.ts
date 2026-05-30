@@ -4,7 +4,7 @@ import { AIProvider } from "./provider.interface";
 import { ZodCVProfile, CVProfile } from "@/schemas/cv-profile.schema";
 
 export class GroqProvider implements AIProvider {
-  private modelName = process.env.GROQ_MODEL || "llama-4-scout-17b-16e-instruct";
+  private modelName = "llama-4-scout-17b-16e-instruct"; // Hardcoded to bypass Vercel env var conflicts
   private groq = createGroq({
     apiKey: process.env.GROQ_API_KEY || "",
   });
@@ -12,6 +12,8 @@ export class GroqProvider implements AIProvider {
   async extractProfile(text: string) {
     const response = await generateObject({
       model: this.groq(this.modelName),
+      // @ts-expect-error force standard json object instead of unsupported json_schema
+      mode: "json",
       schema: ZodCVProfile,
       prompt: `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada respetando el esquema de datos requerido. Asegúrate de categorizar adecuadamente cada habilidad.
 
@@ -29,6 +31,8 @@ ${text}`,
   async adaptCV(profile: CVProfile, jobDescription: string) {
     const response = await generateObject({
       model: this.groq(this.modelName),
+      // @ts-expect-error force standard json object instead of unsupported json_schema
+      mode: "json",
       schema: ZodCVProfile,
       prompt: `Adapta el siguiente currículum vitae (CV) maestro para que se ajuste a la oferta de trabajo indicada.
 Sigue estas directrices:

@@ -23,6 +23,19 @@ interface Props {
 export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
   const [data, setData] = useState<CVProfile>(initialData);
   const [isSaving, setIsSaving] = useState(false);
+  const [template, setTemplate] = useState<"modern" | "classic" | "creative">("modern");
+  const [themeColor, setThemeColor] = useState<string>("#4F46E5");
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handlePersonalChange("fotoUrl", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handlePersonalChange = (key: keyof typeof data.datosPersonales, val: string) => {
     setData((prev) => ({
@@ -173,22 +186,25 @@ export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
             Modifica y refina cualquier detalle de la adaptación generada antes de exportar el PDF.
           </p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           {onSave && (
             <Button onClick={handleSaveClick} disabled={isSaving} variant="outline" className="w-full sm:w-auto">
               {isSaving ? "Guardando..." : "Guardar Cambios"}
             </Button>
           )}
-          <LazyPDFButton cvData={data} />
+          <div className="w-full sm:w-auto flex">
+            <LazyPDFButton cvData={data} template={template} themeColor={themeColor} />
+          </div>
         </div>
       </div>
 
       <Tabs defaultValue="datos" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
+        <TabsList className="grid w-full grid-cols-5 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
           <TabsTrigger value="datos" className="rounded-md font-medium text-xs sm:text-sm">Contacto</TabsTrigger>
           <TabsTrigger value="experiencia" className="rounded-md font-medium text-xs sm:text-sm">Experiencia</TabsTrigger>
           <TabsTrigger value="educacion" className="rounded-md font-medium text-xs sm:text-sm">Educación</TabsTrigger>
-          <TabsTrigger value="habilidades" className="rounded-md font-medium text-xs sm:text-sm">Habilidades</TabsTrigger>
+          <TabsTrigger value="habilidades" className="rounded-md font-medium text-xs sm:text-sm">Skills</TabsTrigger>
+          <TabsTrigger value="diseno" className="rounded-md font-medium text-xs sm:text-sm bg-gradient-to-r from-indigo-100 to-rose-100 text-indigo-700 data-[state=active]:from-indigo-500 data-[state=active]:to-rose-500 data-[state=active]:text-white">Diseño</TabsTrigger>
         </TabsList>
 
         {/* DATOS PERSONALES */}
@@ -199,6 +215,20 @@ export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid-cols-1 md:col-span-2 space-y-1 mb-2">
+                  <label className="text-xs font-semibold text-slate-500">Fotografía de Perfil (Opcional)</label>
+                  <div className="flex items-center gap-4">
+                    {data.datosPersonales.fotoUrl && (
+                      <img src={data.datosPersonales.fotoUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover shadow-sm border border-slate-200" />
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="cursor-pointer file:text-sm file:font-semibold file:text-indigo-600 file:bg-indigo-50 file:border-0 file:rounded-md file:px-4 file:py-1 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-200"
+                    />
+                  </div>
+                </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-500">Nombre Completo</label>
                   <Input
@@ -248,6 +278,56 @@ export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
                     value={data.datosPersonales.portfolio}
                     onChange={(e) => handlePersonalChange("portfolio", e.target.value)}
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* DISEÑO */}
+        <TabsContent value="diseno" className="pt-4 space-y-4">
+          <Card className="border-indigo-100 dark:border-indigo-900 shadow-lg">
+            <CardHeader className="bg-indigo-50/50 dark:bg-indigo-950/20 rounded-t-xl">
+              <CardTitle className="text-md text-indigo-900 dark:text-indigo-200">Personalización Visual del PDF</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8 pt-6">
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Plantilla del Currículum</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Button variant={template === "modern" ? "default" : "outline"} onClick={() => setTemplate("modern")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "modern" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
+                    <span className="font-bold text-base">Moderna</span>
+                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Dos columnas limpias. Un diseño estándar infalible.</span>
+                  </Button>
+                  <Button variant={template === "classic" ? "default" : "outline"} onClick={() => setTemplate("classic")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "classic" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
+                    <span className="font-bold text-base">Clásica</span>
+                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Una columna tradicional. Elegancia para banca y consultoría.</span>
+                  </Button>
+                  <Button variant={template === "creative" ? "default" : "outline"} onClick={() => setTemplate("creative")} className={`justify-start h-auto py-4 px-4 flex flex-col items-start gap-1 transition-all ${template === "creative" ? "ring-2 ring-indigo-500 ring-offset-2" : "hover:bg-slate-50"}`}>
+                    <span className="font-bold text-base">Creativa</span>
+                    <span className="text-xs font-normal opacity-80 whitespace-normal text-left">Bloques vibrantes y foto destacada. Para marketing o tech.</span>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Color de Acento Principal</label>
+                <div className="flex flex-wrap gap-4">
+                  {[
+                    { name: "Índigo Profesional", value: "#4F46E5" },
+                    { name: "Esmeralda", value: "#10B981" },
+                    { name: "Rosa Vibrante", value: "#E11D48" },
+                    { name: "Pizarra Minimalista", value: "#334155" },
+                    { name: "Cielo Corporativo", value: "#0284C7" },
+                    { name: "Naranja Creativo", value: "#EA580C" }
+                  ].map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => setThemeColor(color.value)}
+                      className={`w-12 h-12 rounded-full border-2 transition-transform duration-200 ${themeColor === color.value ? 'border-slate-900 dark:border-white scale-125 shadow-lg' : 'border-transparent hover:scale-110 shadow-sm'}`}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    />
+                  ))}
                 </div>
               </div>
             </CardContent>

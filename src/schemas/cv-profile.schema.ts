@@ -39,6 +39,7 @@ export const PersonalDataSchema = z.object({
   linkedin: z.string().url("URL de LinkedIn inválida").optional().or(z.literal("")),
   github: z.string().url("URL de GitHub inválida").optional().or(z.literal("")),
   portfolio: z.string().url("URL de Portfolio inválida").optional().or(z.literal("")),
+  fotoUrl: z.string().optional(),
 });
 
 export const ZodCVProfile = z.object({

@@ -13,6 +13,7 @@ export class GroqProvider implements AIProvider {
   async extractProfile(text: string) {
     const response = await generateObject({
       model: this.client(this.modelName),
+      mode: "json",
       schema: ZodCVProfile,
       prompt: `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada respetando el esquema de datos requerido. Asegúrate de categorizar adecuadamente cada habilidad.
 
@@ -30,6 +31,7 @@ ${text}`,
   async adaptCV(profile: CVProfile, jobDescription: string) {
     const response = await generateObject({
       model: this.client(this.modelName),
+      mode: "json",
       schema: ZodCVProfile,
       prompt: `Adapta el siguiente currículum vitae (CV) maestro para que se ajuste a la oferta de trabajo indicada.
 Sigue estas directrices:

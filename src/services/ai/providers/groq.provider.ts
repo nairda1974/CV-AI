@@ -1,20 +1,17 @@
-import { createOpenAI } from "@ai-sdk/openai";
+import { createGroq } from "@ai-sdk/groq";
 import { generateObject } from "ai";
 import { AIProvider } from "./provider.interface";
 import { ZodCVProfile, CVProfile } from "@/schemas/cv-profile.schema";
 
 export class GroqProvider implements AIProvider {
   private modelName = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
-  private client = createOpenAI({
-    baseURL: "https://api.groq.com/openai/v1",
+  private groq = createGroq({
     apiKey: process.env.GROQ_API_KEY || "",
   });
 
   async extractProfile(text: string) {
     const response = await generateObject({
-      model: this.client(this.modelName),
-      // @ts-ignore: force json mode for Groq
-      mode: "json",
+      model: this.groq(this.modelName),
       schema: ZodCVProfile,
       prompt: `Analiza el siguiente texto de un CV (curriculum vitae) y extrae toda la información de manera estructurada respetando el esquema de datos requerido. Asegúrate de categorizar adecuadamente cada habilidad.
 
@@ -31,9 +28,7 @@ ${text}`,
 
   async adaptCV(profile: CVProfile, jobDescription: string) {
     const response = await generateObject({
-      model: this.client(this.modelName),
-      // @ts-ignore: force json mode for Groq
-      mode: "json",
+      model: this.groq(this.modelName),
       schema: ZodCVProfile,
       prompt: `Adapta el siguiente currículum vitae (CV) maestro para que se ajuste a la oferta de trabajo indicada.
 Sigue estas directrices:

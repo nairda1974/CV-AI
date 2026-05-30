@@ -113,9 +113,8 @@ export default function ClientAdaptationFlow({ perfiles }: Props) {
         )}
         <Button
           variant="ghost"
-          size="sm"
           onClick={() => setStep("form")}
-          className="flex items-center gap-1.5"
+          className="inline-flex h-8 items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30 px-3 rounded-full transition-all hover:-translate-x-1"
         >
           <ArrowLeft className="h-4 w-4" /> Volver a Formulario de Adaptación
         </Button>

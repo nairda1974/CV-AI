@@ -11,7 +11,7 @@ export default function NuevoPerfilPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors font-medium"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30 py-1.5 px-3 rounded-full transition-all hover:-translate-x-1"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver al Dashboard

@@ -4,7 +4,7 @@ import { AIProvider } from "./provider.interface";
 import { ZodCVProfile, CVProfile } from "@/schemas/cv-profile.schema";
 
 export class GroqProvider implements AIProvider {
-  private modelName = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+  private modelName = process.env.GROQ_MODEL || "llama-3.2-90b-vision-preview";
   private groq = createGroq({
     apiKey: process.env.GROQ_API_KEY || "",
   });

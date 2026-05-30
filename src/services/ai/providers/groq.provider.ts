@@ -71,8 +71,8 @@ Devuelve un JSON exacto que cumpla estrictamente con este formato:
     {
       "empresa": "string",
       "puesto": "string",
-      "fechaInicio": "YYYY-MM",
-      "fechaFin": "YYYY-MM o 'Presente'",
+      "fechaInicio": "Mes de Año (ej. Septiembre de 2021)",
+      "fechaFin": "Mes de Año o 'Actualidad'",
       "descripcion": "string (al menos 10 caracteres explicativos)",
       "logros": ["string"]
     }
@@ -81,8 +81,8 @@ Devuelve un JSON exacto que cumpla estrictamente con este formato:
     {
       "institucion": "string",
       "titulo": "string",
-      "fechaInicio": "YYYY-MM",
-      "fechaFin": "YYYY-MM"
+      "fechaInicio": "Mes de Año",
+      "fechaFin": "Mes de Año o 'Actualidad'"
     }
   ],
   "habilidades": [
@@ -122,8 +122,37 @@ Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado en el CV m
 IMPORTANTE: 
 - El objeto "datosPersonales" debe mantenerse íntegro.
 - La "categoria" de cualquier habilidad DEBE ser una de estas palabras literales: "frontend", "backend", "database", "cloud", "devops", "soft-skill", "other". ¡Ninguna más!
+- EXPRESA TODAS LAS FECHAS EN FORMATO HUMANO (ej. "Septiembre de 2025" o "Actualidad"). NUNCA uses números como "2025-09".
 
 CV Maestro:
+${JSON.stringify(profile, null, 2)}
+
+Oferta de Trabajo:
+${jobDescription}`;
+
+    const result = await this.generateValidatedJSON(prompt, ZodCVProfile);
+
+    return {
+      object: result.object,
+      usage: result.usage,
+      modelUsed: this.modelName,
+    };
+  }
+  }
+
+  async optimizeCVForATS(profile: CVProfile, jobDescription: string) {
+    const prompt = `Eres un experto en optimización de currículums para sistemas ATS (Applicant Tracking Systems).
+Tu tarea es tomar el CV actual y afinarlo al MÁXIMO para que encaje perfectamente con la oferta de trabajo provista, SIN MENTIR NI INVENTAR DATOS.
+
+Reglas estrictas:
+1. Reescribe los "logros" y la "descripcion" de cada experiencia utilizando las mismas palabras clave (keywords) exactas que aparecen en la oferta.
+2. Si el candidato tiene habilidades que encajan con la oferta, destácalas o sube su prioridad.
+3. EXPRESA TODAS LAS FECHAS EN FORMATO HUMANO (ej. "Septiembre de 2025" o "Actualidad"). No uses números como "2025-09".
+4. NO INVENTES experiencia laboral, años de experiencia, ni educación que no exista en el CV original. Solo optimiza la semántica y el vocabulario.
+
+Devuelve EXACTAMENTE la misma estructura JSON que se ha proporcionado.
+
+CV Actual:
 ${JSON.stringify(profile, null, 2)}
 
 Oferta de Trabajo:

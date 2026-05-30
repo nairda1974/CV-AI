@@ -9,6 +9,7 @@ import { CVProfile, SkillCategory } from "@/schemas/cv-profile.schema";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Trash2, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
+import { optimizeForAtsAction } from "@/actions/ats.action";
 
 const LazyPDFButton = dynamic(() => import("./LazyPDFButton"), {
   ssr: false,
@@ -18,11 +19,13 @@ const LazyPDFButton = dynamic(() => import("./LazyPDFButton"), {
 interface Props {
   initialData: CVProfile;
   onSave?: (data: CVProfile) => Promise<void>;
+  jobDescription?: string;
 }
 
-export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
+export default function HumanInTheLoopEditor({ initialData, onSave, jobDescription }: Props) {
   const [data, setData] = useState<CVProfile>(initialData);
   const [isSaving, setIsSaving] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const [template, setTemplate] = useState<"modern" | "classic" | "creative">("modern");
   const [themeColor, setThemeColor] = useState<string>("#4F46E5");
 
@@ -175,6 +178,24 @@ export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
     }
   };
 
+  const handleOptimizeClick = async () => {
+    if (!jobDescription) return;
+    setIsOptimizing(true);
+    try {
+      const optimizedData = await optimizeForAtsAction(data, jobDescription);
+      // Mantener la foto anterior si la IA no la devuelve
+      if (data.datosPersonales.fotoUrl && !optimizedData.datosPersonales.fotoUrl) {
+        optimizedData.datosPersonales.fotoUrl = data.datosPersonales.fotoUrl;
+      }
+      setData(optimizedData);
+    } catch (err) {
+      console.error(err);
+      alert("Hubo un error al optimizar el CV.");
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-950 p-4 border rounded-lg shadow-xs">
@@ -187,8 +208,13 @@ export default function HumanInTheLoopEditor({ initialData, onSave }: Props) {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          {jobDescription && (
+            <Button onClick={handleOptimizeClick} disabled={isOptimizing || isSaving} variant="secondary" className="w-full sm:w-auto bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 transition-all font-bold">
+              {isOptimizing ? "Optimizando..." : "✨ Optimizar ATS"}
+            </Button>
+          )}
           {onSave && (
-            <Button onClick={handleSaveClick} disabled={isSaving} variant="outline" className="w-full sm:w-auto">
+            <Button onClick={handleSaveClick} disabled={isSaving || isOptimizing} variant="outline" className="w-full sm:w-auto">
               {isSaving ? "Guardando..." : "Guardar Cambios"}
             </Button>
           )}

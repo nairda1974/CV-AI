@@ -55,7 +55,7 @@ export default async function CVPage({ params }: Props) {
           </div>
         </div>
 
-        <HumanInTheLoopEditor initialData={initialData} onSave={handleSaveEdits} />
+        <HumanInTheLoopEditor initialData={initialData} onSave={handleSaveEdits} jobDescription={cv.jobOffer.descripcion} />
       </div>
     </main>
   );

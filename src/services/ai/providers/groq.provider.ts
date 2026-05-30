@@ -138,7 +138,6 @@ ${jobDescription}`;
       modelUsed: this.modelName,
     };
   }
-  }
 
   async optimizeCVForATS(profile: CVProfile, jobDescription: string) {
     const prompt = `Eres un experto en optimización de currículums para sistemas ATS (Applicant Tracking Systems).
